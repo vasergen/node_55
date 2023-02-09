@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form id="form">
+      <label for="priceMin">Min</label>
+      <input type="number" name="priceMin" />
+
+      <label for="priceMax">Max</label>
+      <input type="number" name="priceMax" />
+
+      <label for="color">Color</label>
+      <select name="color">
+        <option value=""></option>
+        <option value="red">Red</option>
+        <option value="green">Green</option>
+        <option value="blue">Blue</option>
+      </select>
+
+      <br />
+      <button type="submit">Search</button>
+    </form>
+
+    <ul id="fridges"></ul>
+
+    <script type="module">
+      const form = document.getElementById("form");
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const priceMin = event.target.priceMin.value;
+        const priceMax = event.target.priceMax.value;
+        const color = event.target.color.value;
+
+        const host = "http://localhost:3001";
+        const url = `${host}/api/fridges?priceMin=${priceMin}&priceMax=${priceMax}&color=${color}`;
+        console.log("submitting form", url);
+        const response = await fetch(url, { method: "GET" });
+        const body = await response.json();
+        console.log("got results", body);
+        renderFridges(body.data.fridges);
+      });
+
+      function renderFridges(fridges) {
+        const fridgesEl = document.getElementById("fridges");
+        fridgesEl.innerHTML = "";
+
+        const elements = fridges.forEach((fridge) => {
+          const li = document.createElement("li");
+          li.innerText = `brand: ${fridge.brand}, price: ${fridge.price}, color: ${fridge.color}`;
+          fridgesEl.append(li);
+        });
+      }
+    </script>
+  </body>
+</html>
