@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <form id="form">
+      <label for="user">User</label>
+      <input type="text" name="user" />
+
+      <label for="message">Message</label>
+      <input type="text" name="message" />
+
+      <button type="submit">Send</button>
+    </form>
+
+    <ul id="messages"></ul>
+
+    <script>
+      const ws = io();
+
+      ws.on("chatInfo", (message) => {
+        console.log(message);
+      });
+
+      ws.on("chatMessage", (message) => {
+        addMessageToDom(message);
+      });
+
+      const form = document.getElementById("form");
+
+      form.addEventListener("submit", function (e) {
+        console.log("submit");
+        e.preventDefault();
+
+        const message = e.target.message.value;
+        const user = e.target.user.value;
+
+        const event = `${user}: ${message}`;
+
+        ws.emit("chatMessage", event); // send to server
+        addMessageToDom(event);
+
+        e.target.message.value = "";
+      });
+
+      function addMessageToDom(event) {
+        const ul = document.getElementById("messages");
+        const li = document.createElement("li");
+        li.innerText = event;
+
+        ul.appendChild(li);
+      }
+    </script>
+  </body>
+</html>
